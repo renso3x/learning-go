@@ -1,0 +1,86 @@
+# Chatbot SDK
+
+## Installation!
+
+```bash
+npm i -S @axa-asia/chatbot-sdk react-native-webview
+```
+
+## Setup Web Assets Folder [REQUIRED]
+
+- Go to package file `bash node_modules/@axa-asia/chatbot-sdk/src/html/Web.bundle`
+
+> Setup iOS - open the ios folder and double-click the xcodeproj (or xcworkspace if you have one) project file to launch Xcode. Click on the Project Navigator and expand the first folder named after your project name. Have the Finder side-by-side, then drag-in the Web.bundle folder. It should look like this at the end.
+> ![Alt text](ios_webbundle.png)
+
+> When you drop the folder, a dialog will appear. Make sure “Copy items if needed” is unchecked.
+> ![Alt text](copy_ios.png)
+
+> To setup Android — open path/to/project/android/app/build.gradle file in your editor and add this line inside the android clause like so:
+
+```bash
+android {
+  ...
+  sourceSets {
+    main { assets.srcDirs = ['src/main/assets', '../../html'] }
+  }
+}
+```
+
+## Usage
+
+We expect that you already have `react-native-router-flux` installed to manage your views.
+
+### Initialization
+
+Simply initialize the chatbot instance and add the component to the list of router scenes.
+
+```javascript
+import { init } from '@axa-asia/chatbot-sdk';
+import Home from './components/Home';
+
+export default function App() {
+  // Initialize the chatbot instance
+  const ChatbotInstance = init({ isExpo: false });
+
+  return (
+    <Router>
+      <Stack key="root">
+        <Scene key="home" component={Home} title="Home" />
+        {ChatbotInstance.getComponent()}
+      </Stack>
+    </Router>
+  );
+}
+```
+
+### Launch the app
+
+Get the current instance of the app and call `launch()` function
+
+```javascript
+...
+import { getInstance } from '@axa-asia/chatbot-sdk';
+
+export default function Home() {
+  // Get chatbot instance
+  const ChatbotInstance = getInstance();
+
+  const launchChatbot = () => {
+    ChatbotInstance.launch({
+     linkHandler: link => {
+        const re = /^(http|https):/i;
+        const isLink = re.test(link);
+        return isLink && Linking.openURL(link);
+      },
+      username: 'Juan Dela Cruz'
+    });
+  };
+
+  return (
+    <View style={{ flex: 1 }}>
+      <Button title="Launch Chatbot" onPress={() => launchChatbot()} />
+    </View>
+  );
+}
+```
